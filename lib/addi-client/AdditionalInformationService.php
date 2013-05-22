@@ -84,7 +84,7 @@ class AdditionalInformationService {
     $time = floatval(($stopTime[1] + $stopTime[0]) - ($startTime[1] + $startTime[0]));
 
     //Drupal specific code - consider moving this elsewhere
-    if (variable_get('addi_enable_logging', false)) {
+    if (variable_get('addi_enable_logging', FALSE)) {
       watchdog('addi', 'Completed request (' . round($time, 3) . 's): Ids: %ids', array('%ids' => implode(', ', $ids)), WATCHDOG_DEBUG, 'http://' . $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"]);
     }
 

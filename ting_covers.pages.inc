@@ -1,16 +1,32 @@
 <?php
 
 /**
- * Return the URL for the cover of an object
+ * Return the URL for the cover of an object.
+ *
+ * Handles ajax request.
  */
 function ting_covers_objects() {
+  $covers = _ting_covers_objects($_POST['coverData']);
+
+  //Return all image information
+  drupal_json_output($covers);
+}
+
+/**
+ * Get images and style them.
+ *
+ * @param array $post
+ *   Array of "item_id:image_style" strings.
+ * @return array
+ *   "item_id:image_style" => styles image URL.
+ */
+function _ting_covers_objects($post, $throw_exceptions = FALSE) {
   $covers = array();
   $missing_images_local_ids = array();
 
-  foreach ($_POST['coverData'] as $cover_info) {
-    //Reverse cover_info before and after explode to make sure that we explode around
-    //the last :. Local ids could contain the delimiter!
-    list($local_id, $image_style) = array_reverse(array_map('strrev', explode(':', strrev($cover_info), 2)));
+  foreach ($post as $cover_info) {
+    // $cover_info = local_id:image_style.
+    list($local_id, $image_style) = explode(':', $cover_info);
 
     //Determine if the local id is a known negative
     if (cache_get('ting_covers:' . $local_id, FALSE)) {
@@ -33,10 +49,12 @@ function ting_covers_objects() {
     $service = new AdditionalInformationService(variable_get('addi_wsdl_url'), variable_get('addi_username'), variable_get('addi_group'), variable_get('addi_password'));
     //Local ids = Faust numbers. Library object identifiers can be confusing...
     $additional_informations = $service->getByFaustNumber($missing_images_local_ids);
+
     foreach ($missing_images_local_ids as $local_id) {
       //Try to extract the image url from the result
       $source_url = FALSE;
-      if (isset($additional_informations[$local_id]) && $ai = $additional_informations[$local_id]) {
+      if (isset($additional_informations[$local_id])) {
+        $ai = $additional_informations[$local_id];
         if ($ai->detailUrl) {
           $source_url = $ai->detailUrl;
         }
@@ -52,7 +70,8 @@ function ting_covers_objects() {
       }
 
       //Try to download the image locally
-      if ($file = _ting_covers_pages_fetch_image(ting_covers_object_path($local_id), $source_url)) {
+      $file = _ting_covers_pages_fetch_image(ting_covers_object_path($local_id), $source_url);
+      if ($file) {
         //Generate a path corresponding to the downloaded image, styled
         $covers[$local_id . ':' . $image_style] = image_style_url($image_style, $file);
       }
@@ -60,10 +79,12 @@ function ting_covers_objects() {
   }
   catch (Exception $e) {
     watchdog('ting_covers', 'Unable to retrieve covers from ADDI: %message', array('%message' => $e->getMessage()), WATCHDOG_ERROR);
+    if ($throw_exceptions) {
+      throw $e;
+    }
   }
 
-  //Return all image information
-  drupal_json_output($covers);
+  return $covers;
 }
 
 /**

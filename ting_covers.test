@@ -13,10 +13,12 @@ class TingCoversTestCase extends DrupalWebTestCase {
     //Retrieve ADDI information from existing installation before running
     //setup to avoid exposing access information in code.
     //NB: This will fail if running on a bare install.
-    $addi_info = array(	'wsdl_url' => NULL,
-                        'username' => NULL,
-                        'group' => NULL,
-                        'password' => NULL);
+    $addi_info = array(
+      'wsdl_url' => NULL,
+      'username' => NULL,
+      'group' => NULL,
+      'password' => NULL,
+    );
     foreach ($addi_info as $k => $v) {
       $addi_info[$k] = variable_get('addi_' . $k, NULL);
     }
