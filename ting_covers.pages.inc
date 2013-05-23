@@ -8,7 +8,7 @@
 function ting_covers_objects() {
   $covers = _ting_covers_objects($_POST['coverData']);
 
-  //Return all image information
+  // Return all image information.
   drupal_json_output($covers);
 }
 
@@ -28,30 +28,30 @@ function _ting_covers_objects($post, $throw_exceptions = FALSE) {
     // $cover_info = local_id:image_style.
     list($local_id, $image_style) = explode(':', $cover_info);
 
-    //Determine if the local id is a known negative
+    // Determine if the local id is a known negative.
     if (cache_get('ting_covers:' . $local_id, FALSE)) {
       break;
     }
 
     $path = ting_covers_object_path($local_id);
     if (file_exists($path)) {
-      //If we we already have a valid cover image w/o style then just use it
+      // If we we already have a valid cover image w/o style then just use it.
       $covers[$local_id . ':' . $image_style] = image_style_url($image_style, $path);
     }
     else {
-      //Mark the image for retrieval;
+      // Mark the image for retrieval.
       $missing_images_local_ids[] = $local_id;
     }
   }
 
-  //Try to download the missing images
+  // Try to download the missing images.
   try {
     $service = new AdditionalInformationService(variable_get('addi_wsdl_url'), variable_get('addi_username'), variable_get('addi_group'), variable_get('addi_password'));
-    //Local ids = Faust numbers. Library object identifiers can be confusing...
+    // Local ids = Faust numbers. Library object identifiers can be confusing...
     $additional_informations = $service->getByFaustNumber($missing_images_local_ids);
 
     foreach ($missing_images_local_ids as $local_id) {
-      //Try to extract the image url from the result
+      // Try to extract the image url from the result.
       $source_url = FALSE;
       if (isset($additional_informations[$local_id])) {
         $ai = $additional_informations[$local_id];
@@ -63,16 +63,16 @@ function _ting_covers_objects($post, $throw_exceptions = FALSE) {
         }
       }
 
-      //No cover image found? Cache this for future reference to avoid unnecessary requests
+      // No cover image found? Cache this for future reference to avoid unnecessary requests.
       if (!$source_url) {
         cache_set('ting_covers:' . $local_id, 1, 'cache', $_SERVER['REQUEST_TIME'] + TING_COVERS_CACHE_LIFETIME);
         continue;
       }
 
-      //Try to download the image locally
+      // Try to download the image locally.
       $file = _ting_covers_pages_fetch_image(ting_covers_object_path($local_id), $source_url);
       if ($file) {
-        //Generate a path corresponding to the downloaded image, styled
+        // Generate a path corresponding to the downloaded image, styled.
         $covers[$local_id . ':' . $image_style] = image_style_url($image_style, $file);
       }
     }
@@ -102,7 +102,7 @@ function _ting_covers_objects($post, $throw_exceptions = FALSE) {
 function _ting_covers_pages_fetch_image($filename, $image_url) {
   $result = drupal_http_request($image_url);
 
-  //Bail if the HTTP request failed
+  // Bail if the HTTP request failed.
   if ($result->code != 200) {
     return FALSE;
   }
