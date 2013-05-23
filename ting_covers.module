@@ -29,7 +29,7 @@ function ting_covers_menu() {
   $items['admin/config/ting/covers'] = array(
     'title' => 'Covers',
     'description' => 'Configure how covers are handled.',
-  	'page callback' => 'drupal_get_form',
+    'page callback' => 'drupal_get_form',
     'page arguments' => array('ting_covers_admin_settings_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'ting_covers.admin.inc',
@@ -45,7 +45,7 @@ function ting_covers_menu() {
   $items['admin/config/ting/covers/addi'] = array(
     'title' => 'ADDI service',
     'description' => 'Configure integration with the ADDI service.',
-  	'page callback' => 'drupal_get_form',
+    'page callback' => 'drupal_get_form',
     'page arguments' => array('ting_covers_admin_addi_settings_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'ting_covers.admin.inc',

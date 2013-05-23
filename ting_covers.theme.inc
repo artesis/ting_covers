@@ -4,7 +4,8 @@ function template_preprocess_ting_object_cover(&$variables) {
   $object = $variables['object'] = $variables['elements']['#object'];
   $variables['image_style'] = $variables['elements']['#image_style'];
 
-  $local_id = $object->localId;
+  $local_id = $object->getLocalId();
+
   // Set initial values required by the template.
   $variables['classes'] = array(
     'ting-cover',
@@ -13,8 +14,9 @@ function template_preprocess_ting_object_cover(&$variables) {
   );
 
   // Add isbn-* class, used by VoxB.
-  if (!empty($object->isbn)) {
-    $variables['classes'][] = 'isbn-' . $object->isbn[0];
+  $isbn = $object->getIsbn();
+  if (!empty($isbn)) {
+    $variables['classes'][] = 'isbn-' . $isbn[0];
   }
 
   $variables['image'] = '';
@@ -28,7 +30,7 @@ function template_preprocess_ting_object_cover(&$variables) {
       $alt = $variables['elements']['#alt'];
     }
     else {
-      $alt = implode(', ', $object->creators) . ': ' . $object->title;
+      $alt = implode(', ', $object->getCreators()) . ': ' . $object->getTitle();
     }
 
     $variables['image'] = theme('image_style', array('style_name' => $variables['image_style'], 'path' => $path, 'alt' => $alt));
