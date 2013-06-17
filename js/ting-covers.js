@@ -23,7 +23,10 @@
       //Assemble information regarding covers
       var coverData = [];
       $('.ting-cover:not(.ting-cover-processing, .ting-cover-processed)', context).each(function(i, e) {
-        coverData.push(Drupal.extractCoverData(e));
+        var cover_id = Drupal.extractCoverData(e);
+        if (cover_id) {
+          coverData.push(cover_id);
+        }
       }).addClass('ting-cover-processing');
 
       if (coverData.length > 0) {
