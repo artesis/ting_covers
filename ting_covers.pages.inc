@@ -44,6 +44,11 @@ function _ting_covers_objects($post, $throw_exceptions = FALSE) {
     }
   }
 
+  // Got all images locally.
+  if (empty($missing_images_local_ids)) {
+    return $covers;
+  }
+
   // Try to download the missing images.
   try {
     $service = new AdditionalInformationService(variable_get('addi_wsdl_url'), variable_get('addi_username'), variable_get('addi_group'), variable_get('addi_password'));
