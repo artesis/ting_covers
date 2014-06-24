@@ -26,7 +26,7 @@ function ting_covers_field_info() {
 function ting_covers_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
   foreach ($entities as $id => $entity) {
     $items[$id][0] = array(
-      'local_id' => $entity->localId,
+      'local_id' => $entity->getLocalId(),
     );
   }
 }
@@ -106,10 +106,9 @@ function ting_covers_field_formatter_view($entity_type, $entity, $field, $instan
       '#object' => $entity,
       '#image_style' => $display['settings']['image_style'],
       '#attached' => array(
-    	'js' => array(drupal_get_path('module', 'ting_covers') . '/js/ting-covers.js'),
-    ),
-  );
-
+        'js' => array(drupal_get_path('module', 'ting_covers') . '/js/ting-covers.js'),
+      ),
+    );
   }
   return $element;
 }
