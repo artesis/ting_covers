@@ -43,8 +43,24 @@ class AdditionalInformationService {
 
   protected function sendRequest($identifiers) {
     $ids = array();
-    foreach ($identifiers as $i) {
-      $ids = array_merge($ids, array_values($i));
+    foreach ($identifiers as $identifier) {
+      $type = key($identifier);
+      $value = $identifier[$type];
+
+      // Override material type.
+      // Assume that unusual item id's should be treated as localIdentifiers.
+      // This wraps both v2.1 and v2.6 of moreinfo.
+      if (preg_match('/[a-z]+/i', $value)) {
+        $ids[] = array(
+          'localIdentifier' => $value,
+          'libraryCode' => $this->group,
+        );
+      }
+      else {
+        $ids[] = array(
+          $type => $value,
+        );
+      }
     }
 
     $authInfo = array('authenticationUser' => $this->username,
@@ -71,11 +87,13 @@ class AdditionalInformationService {
     }
 
     try {
-      $response = $client->$method(array(
-                          'authentication' => $authInfo,
-                          'identifier' => $identifiers));
-    }
-    catch (Exception $e) {
+      $response = $client->$method(
+        array(
+          'authentication' => $authInfo,
+          'identifier'     => $ids,
+        )
+      );
+    } catch (Exception $e) {
       // Re-throw Addi specific exception.
       throw new AdditionalInformationServiceException($e->getMessage());
     }
