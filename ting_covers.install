@@ -15,3 +15,9 @@ function ting_covers_update_7100(&$sandbox) {
   $query->execute();
 }
 
+/**
+ * Set moreinfo version 2.10.
+ */
+function ting_covers_update_7101() {
+  variable_set('addi_wsdl_url', 'http://moreinfo.addi.dk/2.10/');
+}
