@@ -66,7 +66,7 @@ class AdditionalInformationService {
     $authInfo = array('authenticationUser' => $this->username,
                       'authenticationGroup' => $this->group,
                       'authenticationPassword' => $this->password);
-    $client = new SoapClient($this->wsdlUrl);
+    $client = new SoapClient($this->wsdlUrl . '/?wsdl');
 
     $startTime = explode(' ', microtime());
     $response = NULL;
